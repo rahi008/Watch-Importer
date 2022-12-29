@@ -42,9 +42,11 @@ namespace Watch_Importer
         public Form1()
         {
             InitializeComponent();
-            //https://paradoxfwc.com/?s=010-01685-00&post_type=product
+            //https://paradoxfwc.com/?s=GW-8230B-9ACR&post_type=product
             AttachControlEventHandlers(this.WV);
-            //WV.Source=new Uri("C:\\home\\mdcdiamonds.com\\wwwroot\\images\\ProductImages\\watches");
+            //WV.Source=new Uri("C:\\home\\mdcdiamonds.com\\wwwroot\\images\\ProductImages\\watches\\");
+            //WV.Source=new Uri("https://paradoxfwc.com/?s=GW-8230B-9ACR&post_type=product");
+            //WV.Source=new Uri("D:\\Kaiser's Drive\\OneDrive\\VisualStudio\\source\\repos\\Watch Importer\\Watch Importer\\bin\\Debug\\output\\");
         }
         void readCSV()
         {
@@ -75,12 +77,21 @@ namespace Watch_Importer
             }
             catch (Exception ex)
             {
+                textBox2.AppendText(ex.Message);
+                textBox2.AppendText(Environment.NewLine);
                 MessageBox.Show(ex.Message);
             }
         }
         void loadPage()
         {
-            if (listc.Count == 0) { inserttoDb(); return; }
+            textBox2.AppendText("Items remaining: ");
+            textBox2.AppendText(listc.Count.ToString());
+            textBox2.AppendText(Environment.NewLine);
+            if (listc.Count == 0) 
+            {
+                inserttoDb(); 
+                return; 
+            }
             watches reslt;
             listc.TryDequeue(out reslt);
             name = reslt.SKU_Code.Replace("-", "");
@@ -145,7 +156,8 @@ namespace Watch_Importer
                         html = res.ToString();
                         var url = RetLine(html, 0, "<img src=\"", "\" alt");
                         if (url == "") goto skp;
-                        
+                        if (url.Contains("webp")) goto skp;
+
                         using (WebClient webClient = new WebClient())
                         {
                             byte[] data = webClient.DownloadData(url);
@@ -168,6 +180,7 @@ namespace Watch_Importer
                     skp:
                         if (String.IsNullOrEmpty(firstI)) { firstI = fname; }
                         i++;
+                        
                     }
                     allN.Remove(allN.Length - 1, 1);
                     watch tmp = new watch();
@@ -186,8 +199,11 @@ namespace Watch_Importer
                 }
                 
             }
-            catch (Exception ex) { 
-                MessageBox.Show(ex.Message);}
+            catch (Exception ex) {
+                textBox2.AppendText(ex.Message);
+                textBox2.AppendText(Environment.NewLine);
+                MessageBox.Show(ex.Message);
+            }
         nod:
             allN = "";
             firstI = "";
@@ -284,8 +300,11 @@ namespace Watch_Importer
                 }
                 
             }
-            catch
+            catch(Exception ex)
             {
+                textBox2.AppendText(ex.Message);
+                textBox2.AppendText(Environment.NewLine);
+                MessageBox.Show(ex.Message);
             }
         }
         private void button1_Click(object sender, EventArgs e)
